@@ -10,7 +10,6 @@ import './token/StandardToken.sol';
  **/
 
 contract TimeLockedToken is StandardToken {
-  uint public startDate;
   uint public releaseDate;
  
  //Modifier that limits transfers to after the release date
@@ -21,9 +20,9 @@ contract TimeLockedToken is StandardToken {
 
   //Constructor takes a days to release integer.
   //It's important to note that this goes into effect from the day of the token contract creation.
-  function TimeLockedToken(uint _daysToRelease) public {
-      startDate = now;
-      releaseDate = startDate + _daysToRelease * 1 days;
+  function TimeLockedToken(uint _releaseDate) public {
+      require(_releaseDate > now);
+      releaseDate = _releaseDate;
   }
 
 
