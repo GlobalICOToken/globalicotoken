@@ -9,15 +9,18 @@ contract HurtigCrowdsale is RefundableCrowdsale, CappedCrowdsale {
     uint public constant SOFTCAP = 100 ether;
     uint public constant weiRate = 1 ether / 1000;
     address public wallet =  address(0); 
-    uint public constant start = now;
-    uint public constant end = start + 60 days;
-    uint public constant tokenRelease = end + 180 days;
+    uint public start;
+    uint public end;
+    uint public tokenRelease;
     
     function HurtigCrowdsale()
         public
         RefundableCrowdsale(SOFTCAP)
         CappedCrowdsale(HARDCAP)
         Crowdsale(start, end, weiRate, wallet) {
+            start = now;
+            end = start + 60 days;
+            tokenRelease = end + 180 days;
 
     }
 

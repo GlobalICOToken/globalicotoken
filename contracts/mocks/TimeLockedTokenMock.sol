@@ -5,8 +5,7 @@ import '../TimeLockedToken.sol';
 // mock class using PausableToken
 contract TimeLockedTokenMock is TimeLockedToken {
 
-  function TimeLockedTokenMock(address initialAccount, uint initialBalance, uint _releaseDate) public {
+  function TimeLockedTokenMock(address initialAccount, uint initialBalance, uint _releaseDate) TimeLockedToken(_releaseDate) public {
     balances[initialAccount] = initialBalance;
-    releaseDate = _releaseDate;
   }
 }
