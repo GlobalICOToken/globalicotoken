@@ -27,11 +27,6 @@ contract('TimeLockedToken',function(accounts){
         assert.equal(balance0,0);
         let balance1 = await token.balanceOf(accounts[1]);
         assert.equal(balance1,1);
-        //await token.transfer(accounts[0], 1, {from: accounts[1]});
-        //balance0 = await token.balanceOf(accounts[0]);
-        //assert.equal(balance0,1);
-        //balance1 = await token.balanceOf(accounts[1]);
-        //assert.equal(balance1,0);
     });
       it('should throw an error trying to transfer before the release time', async function (){
         let time = await web3.eth.getBlock(web3.eth.blockNumber).timestamp;
