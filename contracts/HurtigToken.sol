@@ -7,8 +7,9 @@ contract HurtigToken is TimeLockedToken, MintableToken {
     // Standard constants for token readability
     string public constant name = "HurtigToken";
     string public constant symbol = "HRTG";
-    uint256 public constant decimals = 0;
+    uint256 public constant decimals = 10^18;
     
     function HurtigToken(uint daysToRelease) TimeLockedToken(daysToRelease) public {
+        totalSupply = 0;
     }
 }

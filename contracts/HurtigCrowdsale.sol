@@ -1,26 +1,23 @@
 pragma solidity ^0.4.18;
 
 import './crowdsale/RefundableCrowdsale.sol';
+import './crowdsale/FinalizableCrowdsale.sol';
 import './crowdsale/CappedCrowdsale.sol';
 import './HurtigToken.sol';
 
-contract HurtigCrowdsale is RefundableCrowdsale, CappedCrowdsale {
-    uint public constant HARDCAP = 1000 ether;
-    uint public constant SOFTCAP = 100 ether;
-    uint public constant weiRate = 1 ether / 1000;
-    address public wallet =  address(0); 
-    uint public start;
-    uint public end;
-    uint public tokenRelease;
+contract HurtigCrowdsale is CappedCrowdsale, RefundableCrowdsale {
+    uint256 public tokenRelease;
+    uint256 public maxWeiPerAddress;
+    mapping (address => uint) investedPerAddress;
     
-    function HurtigCrowdsale()
+    function HurtigCrowdsale(
+        uint256 _tokenRelease,
+        uint256 _maxPerAddress
+    )
         public
-        RefundableCrowdsale(SOFTCAP)
-        CappedCrowdsale(HARDCAP)
-        Crowdsale(start, end, weiRate, wallet) {
-            start = now;
-            end = start + 60 days;
-            tokenRelease = end + 180 days;
+    {
+            tokenRelease = _tokenRelease;
+            maxWeiPerAddress = _maxPerAddress;
 
     }
 
@@ -30,6 +27,12 @@ contract HurtigCrowdsale is RefundableCrowdsale, CappedCrowdsale {
         } else {
             claimRefund();
         }
+    }
+
+    function buyTokens(address beneficiary) public payable {
+        require(msg.value + investedPerAddress[beneficiary] <= maxWeiPerAddress);
+        investedPerAddress[beneficiary] += msg.value;
+        super.buyTokens(beneficiary);
     }
 
     function createTokenContract() internal returns (MintableToken) {

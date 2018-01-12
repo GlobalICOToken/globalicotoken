@@ -11,19 +11,19 @@ import './ownership/Ownable.sol';
  **/
 
 contract TimeLockedToken is StandardToken, Ownable {
-  uint public releaseDate;
+  uint256 public releaseDate;
  
  //Modifier that limits transfers to after the release date.
  //The crowdsale, which owns the token contract, is exempt.
   modifier afterRelease(){
-      require(now > releaseDate);
+      require(now >= releaseDate);
       _;
   } 
 
   //Constructor takes a days to release integer.
   //It's important to note that this goes into effect from the day of the token contract creation.
-  function TimeLockedToken(uint _releaseDate) public {
-      require(_releaseDate > now);
+  function TimeLockedToken(uint256 _releaseDate) public {
+      //require(_releaseDate >= now);
       releaseDate = _releaseDate;
   }
 
