@@ -75,8 +75,8 @@ contract('GlobalCrowdsale',function([_,owner,wallet,investor]){
         let sale = await GlobalCrowdsale.new(time,endTime,weiRate,wallet,hardCap,softCap,tokenUnlock,maxPerAdress,minInvestment);
         let token = GlobalToken.at(await sale.token());
         assert.equal(0, await token.balanceOf(investor));
-        web3.currentProvider.send({jsonrpc: "2.0", method: "evm_increaseTime", params: [1000], id: 3});
-        web3.currentProvider.send({jsonrpc: "2.0", method: "evm_mine", id: 3})
+        await web3.currentProvider.send({jsonrpc: "2.0", method: "evm_increaseTime", params: [1000], id: 3});
+        await web3.currentProvider.send({jsonrpc: "2.0", method: "evm_mine", id: 3})
         await sale.sendTransaction({from:investor, value:maxPerAdress});
         assert.equal(maxPerAdress*weiRate, await token.balanceOf(investor));
         try{
@@ -94,16 +94,57 @@ contract('GlobalCrowdsale',function([_,owner,wallet,investor]){
         let sale = await GlobalCrowdsale.new(time,endTime,weiRate,wallet,hardCap,softCap,tokenUnlock,maxPerAdress,minInvestment);
         let token = GlobalToken.at(await sale.token());
         let vault = RefundVault.at(await sale.vault());
-        web3.currentProvider.send({jsonrpc: "2.0", method: "evm_increaseTime", params: [1000], id: 1});
-        web3.currentProvider.send({jsonrpc: "2.0", method: "evm_mine", id: 1})
+        await web3.currentProvider.send({jsonrpc: "2.0", method: "evm_increaseTime", params: [1000], id: 1});
+        await web3.currentProvider.send({jsonrpc: "2.0", method: "evm_mine", id: 1})
         await sale.sendTransaction({from:investor, value:maxPerAdress});
         const deposited1 = await vault.deposited.call(investor);
         assert.equal(maxPerAdress, deposited1);
-        web3.currentProvider.send({jsonrpc: "2.0", method: "evm_increaseTime", params: [endTime-time+100], id: 1});
-        web3.currentProvider.send({jsonrpc: "2.0", method: "evm_mine", id: 1})
+        await web3.currentProvider.send({jsonrpc: "2.0", method: "evm_increaseTime", params: [endTime-time+100], id: 1});
+        await web3.currentProvider.send({jsonrpc: "2.0", method: "evm_mine", id: 1})
         await sale.finalize();
         await sale.sendTransaction({from:investor, value:0});
         const deposited2 = await vault.deposited.call(investor);
         assert.equal(0, deposited2);
+    }); 
+    it('should not refund if softCap hit', async function(){
+        let time = web3.eth.getBlock(web3.eth.blockNumber).timestamp+3;
+        let endTime = time+36000;
+        let tokenUnlock = endTime + 36000;
+        let sale = await GlobalCrowdsale.new(time,endTime,weiRate,wallet,hardCap,100,tokenUnlock,maxPerAdress,minInvestment);
+        let token = GlobalToken.at(await sale.token());
+        let vault = RefundVault.at(await sale.vault());
+        await web3.currentProvider.send({jsonrpc: "2.0", method: "evm_increaseTime", params: [1000], id: 1});
+        await web3.currentProvider.send({jsonrpc: "2.0", method: "evm_mine", id: 1})
+        await sale.sendTransaction({from:investor, value:maxPerAdress});
+        const deposited1 = await vault.deposited.call(investor);
+        assert.equal(maxPerAdress, deposited1);
+        await web3.currentProvider.send({jsonrpc: "2.0", method: "evm_increaseTime", params: [endTime-time+100], id: 1});
+        await web3.currentProvider.send({jsonrpc: "2.0", method: "evm_mine", id: 1})
+        await sale.finalize();
+        try{
+            await sale.sendTransaction({from:investor, value:0});
+            assert.fail();
+        } catch(error) {
+            assert.isAbove(error.message.search('revert'), -1, 'Error containing "revert" must be returned');
+        }
+        const deposited2 = await vault.deposited.call(investor);
+        assert.equal(maxPerAdress, deposited2);
+    });
+    it('owner funds withdrawed if softCap hit, and crowdsale finalized', async function(){
+        let time = web3.eth.getBlock(web3.eth.blockNumber).timestamp+3;
+        let endTime = time+36000;
+        let tokenUnlock = endTime + 36000;
+        let sale = await GlobalCrowdsale.new(time,endTime,weiRate,wallet,hardCap,100,tokenUnlock,maxPerAdress,minInvestment);
+        let token = GlobalToken.at(await sale.token());
+        let vault = RefundVault.at(await sale.vault());
+        await web3.currentProvider.send({jsonrpc: "2.0", method: "evm_increaseTime", params: [1000], id: 1});
+        await web3.currentProvider.send({jsonrpc: "2.0", method: "evm_mine", id: 1})
+        await sale.sendTransaction({from:investor, value:maxPerAdress});
+        await web3.currentProvider.send({jsonrpc: "2.0", method: "evm_increaseTime", params: [endTime-time+100], id: 1});
+        await web3.currentProvider.send({jsonrpc: "2.0", method: "evm_mine", id: 1})
+        let balanceBefore = await web3.eth.getBalance(wallet).toNumber();
+        await sale.finalize();
+        let balanceAfter = await web3.eth.getBalance(wallet).toNumber();
+        assert.isAbove(balanceAfter, balanceBefore); 
     }); 
 });
