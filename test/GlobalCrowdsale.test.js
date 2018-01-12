@@ -1,6 +1,5 @@
 var GlobalCrowdsale = artifacts.require('contracts/mocks/GlobalCrowdsaleImpl.sol');
 var GlobalToken = artifacts.require('contracts/GlobalToken.sol');
-const Crowdsale = artifacts.require('contracts/crowdsale/Crowdsale.sol');
 const RefundVault = artifacts.require('contracts/crowdsale/RefundVault.sol');
 
 contract('GlobalCrowdsale',function([_,owner,wallet,investor]){
