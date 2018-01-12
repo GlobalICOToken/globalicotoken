@@ -20,10 +20,8 @@ contract TimeLockedToken is StandardToken, Ownable {
       _;
   } 
 
-  //Constructor takes a days to release integer.
-  //It's important to note that this goes into effect from the day of the token contract creation.
+  //Constructor takes a specific epoch date, to release tokens.
   function TimeLockedToken(uint256 _releaseDate) public {
-      //require(_releaseDate >= now);
       releaseDate = _releaseDate;
   }
 
