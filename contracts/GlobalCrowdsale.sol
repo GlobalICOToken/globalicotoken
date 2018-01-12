@@ -29,13 +29,10 @@ contract GlobalCrowdsale is CappedCrowdsale, RefundableCrowdsale {
         uint256 _tokenRelease,
         uint256 _maxPerAddress,
         uint256 _minWeiInvestment
-    )
-        public
-    {
-            tokenRelease = _tokenRelease;
-            maxWeiPerAddress = _maxPerAddress;
-            minWeiInvestment = _minWeiInvestment;
-
+    ) public {
+        tokenRelease = _tokenRelease;
+        maxWeiPerAddress = _maxPerAddress;
+        minWeiInvestment = _minWeiInvestment;
     }
     //If the crowdsale is not finalized, attempt to buy tokens. Valid buys are handled later.
     // Else, claim a refund. The purpose of the default function, is to make the user experience as simple as possible.
