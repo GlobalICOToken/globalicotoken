@@ -3,21 +3,24 @@ pragma solidity ^0.4.18;
 import './crowdsale/RefundableCrowdsale.sol';
 import './crowdsale/FinalizableCrowdsale.sol';
 import './crowdsale/CappedCrowdsale.sol';
-import './HurtigToken.sol';
+import './GlobalToken.sol';
 
-contract HurtigCrowdsale is CappedCrowdsale, RefundableCrowdsale {
+contract GlobalCrowdsale is CappedCrowdsale, RefundableCrowdsale {
     uint256 public tokenRelease;
     uint256 public maxWeiPerAddress;
+    uint256 public minWeiInvestment;
     mapping (address => uint) investedPerAddress;
     
-    function HurtigCrowdsale(
+    function GlobalCrowdsale(
         uint256 _tokenRelease,
-        uint256 _maxPerAddress
+        uint256 _maxPerAddress,
+        uint256 _minWeiInvestment
     )
         public
     {
             tokenRelease = _tokenRelease;
             maxWeiPerAddress = _maxPerAddress;
+            minWeiInvestment = _minWeiInvestment;
 
     }
 
@@ -30,13 +33,14 @@ contract HurtigCrowdsale is CappedCrowdsale, RefundableCrowdsale {
     }
 
     function buyTokens(address beneficiary) public payable {
+        require(msg.value >= minWeiInvestment);
         require(msg.value + investedPerAddress[beneficiary] <= maxWeiPerAddress);
         investedPerAddress[beneficiary] += msg.value;
         super.buyTokens(beneficiary);
     }
 
     function createTokenContract() internal returns (MintableToken) {
-        return new HurtigToken(tokenRelease);
+        return new GlobalToken(tokenRelease);
     }
 
     function finalization() internal {
