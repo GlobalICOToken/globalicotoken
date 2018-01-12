@@ -2,6 +2,7 @@
 pragma solidity ^0.4.18;
 
 import './token/StandardToken.sol';
+import './ownership/Ownable.sol';
 
 /**
  * @title TimeLockedToken token
@@ -9,19 +10,18 @@ import './token/StandardToken.sol';
  * @dev StandardToken modified with timelocked transfers.
  **/
 
-contract TimeLockedToken is StandardToken {
-  uint public releaseDate;
+contract TimeLockedToken is StandardToken, Ownable {
+  uint256 public releaseDate;
  
- //Modifier that limits transfers to after the release date
+ //Modifier that limits transfers to after the release date.
+ //The crowdsale, which owns the token contract, is exempt.
   modifier afterRelease(){
-      require(now > releaseDate);
+      require(now >= releaseDate);
       _;
   } 
 
-  //Constructor takes a days to release integer.
-  //It's important to note that this goes into effect from the day of the token contract creation.
-  function TimeLockedToken(uint _releaseDate) public {
-      require(_releaseDate > now);
+  //Constructor takes a specific epoch date, to release tokens.
+  function TimeLockedToken(uint256 _releaseDate) public {
       releaseDate = _releaseDate;
   }
 
