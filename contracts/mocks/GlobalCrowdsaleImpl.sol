@@ -15,12 +15,13 @@ contract GlobalCrowdsaleImpl is GlobalCrowdsale {
     uint256 _softCap,
     uint256 _tokenRelease,
     uint256 _maxWeiPerAddress,
-    uint256 _minWeiInvestment
+    uint256 _minWeiInvestment,
+    uint256 _totalTokenAmount
   ) public
     Crowdsale(_startTime, _endTime, _rate, _wallet)
     CappedCrowdsale(_hardCap)
     RefundableCrowdsale(_softCap)
-    GlobalCrowdsale(_tokenRelease,_maxWeiPerAddress, _minWeiInvestment)
+    GlobalCrowdsale(_tokenRelease,_maxWeiPerAddress, _minWeiInvestment, _totalTokenAmount)
   {
   }
 

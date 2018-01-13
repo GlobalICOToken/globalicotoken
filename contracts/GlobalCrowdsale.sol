@@ -22,17 +22,21 @@ contract GlobalCrowdsale is CappedCrowdsale, RefundableCrowdsale {
     uint256 public maxWeiPerAddress;
     // Minimum wei investment
     uint256 public minWeiInvestment;
+    // Total amount of tokens to be minted
+    uint256 public totalTokenAmount;
     // Mapping from addresses to how much they've invested
     mapping (address => uint) investedPerAddress;
     
     function GlobalCrowdsale(
         uint256 _tokenRelease,
         uint256 _maxPerAddress,
-        uint256 _minWeiInvestment
+        uint256 _minWeiInvestment,
+        uint256 _totalTokenAmount
     ) public {
         tokenRelease = _tokenRelease;
         maxWeiPerAddress = _maxPerAddress;
         minWeiInvestment = _minWeiInvestment;
+        totalTokenAmount = _totalTokenAmount;
     }
     //If the crowdsale is not finalized, attempt to buy tokens. Valid buys are handled later.
     // Else, claim a refund. The purpose of the default function, is to make the user experience as simple as possible.
@@ -58,6 +62,9 @@ contract GlobalCrowdsale is CappedCrowdsale, RefundableCrowdsale {
 
     //When finalizing, also finish minting the token.
     function finalization() internal {
+        if(totalTokenAmount > token.totalSupply()){
+            token.mint(wallet,totalTokenAmount - token.totalSupply());
+        }
         token.finishMinting();
         super.finalization();
     }
