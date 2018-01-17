@@ -26,6 +26,8 @@ contract GlobalCrowdsale is CappedCrowdsale, RefundableCrowdsale {
     uint256 public totalTokenAmount;
     // Mapping from addresses to how much they've invested
     mapping (address => uint) investedPerAddress;
+    // Token has been created
+    bool public tokenCreated;
     
     function GlobalCrowdsale(
         uint256 _tokenRelease,
@@ -37,6 +39,7 @@ contract GlobalCrowdsale is CappedCrowdsale, RefundableCrowdsale {
         maxWeiPerAddress = _maxPerAddress;
         minWeiInvestment = _minWeiInvestment;
         totalTokenAmount = _totalTokenAmount;
+        tokenCreated = false;
     }
     //If the crowdsale is not finalized, attempt to buy tokens. Valid buys are handled later.
     // Else, claim a refund. The purpose of the default function, is to make the user experience as simple as possible.
@@ -57,8 +60,10 @@ contract GlobalCrowdsale is CappedCrowdsale, RefundableCrowdsale {
     }
 
     //Create GlobalToken, which implements the MintableToken
-    function createTokenContract() internal returns (MintableToken) {
-        return new GlobalToken(tokenRelease);
+    function createTokenContract() public onlyOwner {
+        require(!tokenCreated);
+        tokenCreated = true;
+        token = new GlobalToken(tokenRelease);
     }
 
     //When finalizing, also finish minting the token.

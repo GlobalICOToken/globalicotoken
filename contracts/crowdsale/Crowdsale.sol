@@ -46,7 +46,7 @@ contract Crowdsale {
     require(_rate > 0);
     require(_wallet != address(0));
 
-    token = createTokenContract();
+    //token = createTokenContract();
     startTime = _startTime;
     endTime = _endTime;
     rate = _rate;
@@ -55,9 +55,9 @@ contract Crowdsale {
 
   // creates the token to be sold.
   // override this method to have crowdsale of a specific mintable token.
-  function createTokenContract() internal returns (MintableToken) {
-    return new MintableToken();
-  }
+  //function createTokenContract() internal returns (MintableToken) {
+  //  return new MintableToken();
+  //}
 
 
   // fallback function can be used to buy tokens
