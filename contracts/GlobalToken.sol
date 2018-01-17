@@ -9,7 +9,7 @@ contract GlobalToken is TimeLockedToken, MintableToken {
     string public constant symbol = "GLIF";
     uint256 public constant decimals = 18;
     
-    function GlobalToken(uint daysToRelease) TimeLockedToken(daysToRelease) public {
+    function GlobalToken(uint releaseDate) TimeLockedToken(releaseDate) public {
         totalSupply = 0;
     }
 }
