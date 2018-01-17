@@ -44,6 +44,7 @@ contract GlobalCrowdsale is CappedCrowdsale, RefundableCrowdsale {
         if (!isFinalized) {
             buyTokens(msg.sender);
         } else {
+            require(msg.value <= 0);
             claimRefund();
         }
     }
